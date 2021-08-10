@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vanilla Enigma</title>
+    <link rel="stylesheet" href="./main.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap"
+      rel="stylesheet"
+    />
+    <script src="./crypto.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Enigma</h1>
+      <div class="settings">
+        <div class="rotor" id="rotorOne">
+          <p class="number">00</p>
+          <p class="number">01</p>
+          <p class="number">02</p>
+        </div>
+        <div class="rotor" id="rotorTwo">
+          <p class="number">00</p>
+          <p class="number">01</p>
+          <p class="number">02</p>
+        </div>
+        <div class="rotor" id="rotorThree">
+          <p class="number">00</p>
+          <p class="number">01</p>
+          <p class="number">02</p>
+        </div>
+      </div>
+      <div class="messages">
+        <div class="message"></div>
+        <div class="encrypted"></div>
+      </div>
+      <div class="keyboard">
+        <div class="keyboard-row" id="firstRow">
+          <article>Q</article>
+          <article>W</article>
+          <article>E</article>
+          <article>R</article>
+          <article>T</article>
+          <article>Y</article>
+          <article>U</article>
+          <article>I</article>
+          <article>O</article>
+          <article>P</article>
+        </div>
+        <div class="keyboard-row" id="secondRow">
+          <article>A</article>
+          <article>S</article>
+          <article>D</article>
+          <article>F</article>
+          <article>G</article>
+          <article>H</article>
+          <article>J</article>
+          <article>K</article>
+          <article>L</article>
+        </div>
+        <div class="keyboard-row" id="thirdRow">
+          <article>Z</article>
+          <article>X</article>
+          <article>C</article>
+          <article>V</article>
+          <article>B</article>
+          <article>N</article>
+          <article>M</article>
+        </div>
+        <div class="keyboard-row" id="fourth">
+          <article>SPACE</article>
+        </div>
+      </div>
+    </div>
+  </body>
+
+  <script>
+    // State for rotors counting as they "turn over"
+    let rotorCountOne = 0;
+    let rotorCountTwo = 0;
+    let rotorCountThree = 0;
+
+    // State for rotors' starting indices
+    let rotorOnePosition = 0;
+    let rotorTwoPosition = 0;
+    let rotorThreePosition = 0;
+
+    // DOM elements
+    // Array of all keys from on-screen keyboard
+    let keyboard = document.querySelectorAll(`article`);
+    let message = document.querySelector(`.message`);
+    let encrypted = document.querySelector(`.encrypted`);
+    let rotorOne = document.querySelector(`#rotorOne`);
+    let rotorTwo = document.querySelector(`#rotorTwo`);
+    let rotorThree = document.querySelector(`#rotorThree`);
+    let rotorOnePositions = rotorOne.querySelectorAll(`p`);
+    let rotorTwoPositions = rotorTwo.querySelectorAll(`p`);
+    let rotorThreePositions = rotorThree.querySelectorAll(`p`);
+    let allRotors = [rotorOnePositions, rotorTwoPositions, rotorThreePositions];
+
+    // Set the substitution cypher in place and shift the rotors to a random position
+    let shift = Math.floor(Math.random() * (25 - 0 + 1));
+    let substituted = shuffle(plugboard.alphabet);
+
+    function subEncrypt(letter) {
+      // Find the index of the letter
+      let plainText = plugboard.alphabet.indexOf(letter);
+      let encryptedLetter = substituted[plainText];
+      return encryptedLetter;
+    }
+
+    allRotors.map((rotor, i) => {
+      initialRotorSettings(rotor, i);
+    });
+
+    // Function to step the rotors on each keypress that's not a backspace or a space
+    function stepRotors(key) {
+      console.log(`The plaintext is ${key.innerText}`);
+      const audio = new Audio("key-click.wav");
+      audio.play();
+      if (key.innerText == "SPACE") {
+        message.innerText = message.innerText + `\u00A0`;
+        encrypted.innerText = encrypted.innerText + `\u00A0`;
+      } else {
+        // Substitution encrypt the letter
+        let subCipher = subEncrypt(key.innerText);
+        // Set the plaintext message value
+        message.innerText = message.innerText + key.innerText;
+        // Step the count up one
+        if (rotorCountOne <= 26) {
+          encrypted.innerText =
+            encrypted.innerText +
+            loop(allRotors[2], rotorCountOne, 2, subCipher); // loop the first [3rd] rotor
+          rotorCountOne++;
+        }
+        if (rotorCountOne >= 26 && rotorCountTwo <= 26) {
+          encrypted.innerText =
+            encrypted.innerText +
+            loop(allRotors[1], rotorCountTwo, 1, subCipher); // loop the first [3rd] rotor
+          rotorCountTwo++;
+        }
+        if (rotorCountTwo >= 26 && rotorCountThree <= 26) {
+          encrypted.innerText =
+            encrypted.innerText +
+            loop(allRotors[0], rotorCountThree, 0, subCipher); // loop the first [3rd] rotor
+          rotorCountThree++;
+        }
+        // Reset to original positions TODO: come back and fix, all new settings when reaching this point
+        rotorCountThree >= 26 &&
+          allRotors.map((rotor, i) => {
+            initialRotorSettings(rotor, i);
+          });
+      }
+    }
+
+    //   Function to house all our logic and be invoked
+    function keyboardListener() {
+      // Create the event listener that will do something on each key press
+      document.addEventListener(`keydown`, showEncryptedKey);
+
+      // Function for animating highlight
+      async function highlight(key) {
+        // Step the rotor
+        stepRotors(key);
+        // Check to see if already visible
+        if (message.style.opacity != 1) {
+          message.style.opacity = `1`;
+          encrypted.style.opacity = `1`;
+        }
+        key.style.cssText = `background: white; color: black`;
+        await wait(100);
+        key.style.cssText = `background: transparent; color: white`;
+      }
+
+      function showEncryptedKey(e) {
+        if (e.key === `Backspace`) {
+          message.innerText = message.innerText.slice(0, -1);
+          encrypted.innerText = encrypted.innerText.slice(0, -1);
+        }
+        // For now, just highlight the actual key
+        keyboard.forEach((key) => {
+          (key.innerText === e.key.toUpperCase() && highlight(key)) ||
+            (key.innerText === e.code.toUpperCase() && highlight(key));
+        });
+      }
+    }
+
+    keyboardListener();
+  </script>
+</html>

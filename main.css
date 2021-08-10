@@ -1,0 +1,120 @@
+:root {
+  --gold: hsl(49, 70%, 49%);
+  --red: hsla(9, 78%, 43%, 0.438);
+}
+
+body {
+  margin: 0;
+  background: rgb(15, 10, 1);
+  color: white;
+  font-family: "Special Elite", cursive;
+}
+
+h1 {
+  font-size: 4rem;
+  text-align: center;
+  /* grid-area: 1 / -1; */
+}
+
+.keyboard {
+  display: grid;
+  place-items: center center;
+  font-size: 2rem;
+}
+
+.keyboard-row {
+  display: flex;
+}
+
+article {
+  border: solid 1px white;
+  padding: 2vw;
+  transition: ease-in-out 0.1s;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 1fr;
+  place-items: start center;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 1200px;
+  min-height: 100vh;
+}
+
+.messages {
+  display: grid;
+  min-height: 5vh;
+  grid-template-columns: 1fr 1fr;
+  line-height: 1.4;
+}
+
+.message {
+  font-size: 1.2rem;
+  place-self: center;
+  padding: 20px 20px;
+  margin: 5vh;
+  max-width: 400px;
+  word-wrap: break-word;
+  background: var(--red);
+  transition: ease-in-out 0.4s;
+  opacity: 0;
+  color: white;
+  align-items: center;
+}
+
+.encrypted {
+  font-size: 1.2rem;
+  place-self: center;
+  padding: 20px 20px;
+  margin: 5vh;
+  max-width: 400px;
+  word-wrap: break-word;
+  background: var(--red);
+  transition: ease-in-out 0.4s;
+  opacity: 0;
+  color: white;
+  align-items: center;
+}
+
+.settings {
+  display: flex;
+  margin-top: 5vh;
+}
+
+.rotor {
+  padding: 10px;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.rotor :nth-child(1) {
+  opacity: 0.2;
+  font-size: 1rem;
+}
+
+.rotor :nth-child(3) {
+  opacity: 0.2;
+  font-size: 1rem;
+}
+
+footer {
+  display: flex;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 900px;
+  width: 100%;
+  justify-content: space-evenly;
+}
+a {
+  font-size: 2rem;
+  color: white;
+  text-decoration: none;
+  transition: ease-in-out 0.2s;
+  cursor: pointer;
+  padding: 20px;
+}
+
+a:hover {
+  color: var(--red);
+}
