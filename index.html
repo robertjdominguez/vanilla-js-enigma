@@ -119,7 +119,6 @@
 
     // Function to step the rotors on each keypress that's not a backspace or a space
     function stepRotors(key) {
-      console.log(`The plaintext is ${key.innerText}`);
       const audio = new Audio("key-click.wav");
       audio.play();
       if (key.innerText == "SPACE") {

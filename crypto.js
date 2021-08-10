@@ -5,18 +5,65 @@ function wait(ms = 0) {
   });
 }
 
+// Transposition through rotors
+function transpo(cipherLetter, key, message) {
+  // Go for current rotor's value
+  let alphaPosition = plugboard.alphabet.indexOf(cipherLetter);
+  console.log(`Starting index is ${alphaPosition}`);
+  let currentRotorEncryptedValue = rotors[key].alphabet[alphaPosition];
+  console.log(
+    `The value after the first rotor is ${currentRotorEncryptedValue}`
+  );
+  // try for second rotor's value
+  if (rotors[key - 1] != undefined) {
+    currentRotorEncryptedValue = rotors[key - 1].alphabet[alphaPosition];
+    console.log(
+      `The value after the second rotor is ${currentRotorEncryptedValue}`
+    );
+  }
+  // try for third rotor's value
+  if (rotors[key - 2] != undefined) {
+    currentRotorEncryptedValue = rotors[key - 2].alphabet[alphaPosition];
+    console.log(
+      `The value after the third rotor is ${currentRotorEncryptedValue}`
+    );
+  }
+  // Finally, reflector's value
+  console.log(`Value before reflector ${currentRotorEncryptedValue}`);
+  currentRotorEncryptedValue = reflector[alphaPosition];
+  console.log(`Value after reflector ${currentRotorEncryptedValue}`);
+  let returnIndex = plugboard.alphabet.indexOf(currentRotorEncryptedValue);
+  console.log(reflector);
+  // Let's make the return trip
+  // try for third rotor's value
+  if (rotors[key - 2] != undefined) {
+    currentRotorEncryptedValue = rotors[key - 2].alphabet[returnIndex];
+    console.log(
+      `The value passing back through the third rotor is ${currentRotorEncryptedValue}`
+    );
+  }
+  if (rotors[key - 1] != undefined) {
+    currentRotorEncryptedValue = rotors[key - 1].alphabet[returnIndex];
+    console.log(
+      `The value passing back through the second rotor is ${currentRotorEncryptedValue}`
+    );
+  }
+  currentRotorEncryptedValue = rotors[key].alphabet[returnIndex];
+  console.log(
+    `The value passing back through the first rotor is ${currentRotorEncryptedValue}`
+  );
+
+  // Return the value
+  return currentRotorEncryptedValue;
+}
+
 // Looping function for rotors
 // Need to list of rotors
 function loop(rotor, count, key, cipherLetter) {
   // convert from node list to an array
   const rotorArray = Array.from(rotor);
-  // Get the encrypted letter
-  let alphaPosition = plugboard.alphabet.indexOf(cipherLetter);
-  console.log(alphaPosition);
-  let encrypted = rotors[key].alphabet[alphaPosition];
-  // Edification
-  console.log(plugboard.alphabet);
-  console.log(rotors[key].alphabet);
+  // Get the encrypted letter via the three rotors and reflector
+  let encrypted = transpo(cipherLetter, key);
   // Move the rotor one step forward in the UI AND the rotor array from this file
   rotorArray.map((position, index) => {
     if (index + count >= 26) {
@@ -30,7 +77,6 @@ function loop(rotor, count, key, cipherLetter) {
 
   let lastLetter = rotors[key].alphabet.pop(rotors[key].alphabet.length - 1);
   rotors[key].alphabet.unshift(lastLetter);
-  console.log(rotors[key].alphabet);
   return encrypted;
 }
 
@@ -200,4 +246,34 @@ const rotors = [
       "L",
     ],
   },
+];
+
+const reflector = [
+  // EJMZALYXVBWFCRQUONTSPIKHGD
+  "E",
+  "J",
+  "M",
+  "Z",
+  "A",
+  "L",
+  "Y",
+  "X",
+  "V",
+  "B",
+  "W",
+  "F",
+  "C",
+  "R",
+  "Q",
+  "U",
+  "O",
+  "N",
+  "T",
+  "S",
+  "P",
+  "I",
+  "K",
+  "H",
+  "G",
+  "D",
 ];
